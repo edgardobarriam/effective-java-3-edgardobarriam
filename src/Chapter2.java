@@ -1,10 +1,15 @@
+import content.*;
+
 import java.math.BigInteger;
 import java.util.EnumSet;
 import java.util.Random;
 
+import static content.NyPizza.Size.SMALL;
+import static content.Pizza.Topping.*;
+
 public class Chapter2 {
 
-   void item1() { // Consider static factory methods instead of constructors
+  void item1() { // Consider static factory methods instead of constructors
 
     // A class can provide a public static factory method. An example from Boolean:
     Boolean myBoolean = Boolean.valueOf(true);
@@ -26,21 +31,76 @@ public class Chapter2 {
     EnumSet<Color> enumSet = EnumSet.allOf(Color.class); // May return RegularEnumSet or JumboEnumSet.
     // Also hides implementation classes from clients, which can be helpful if there are any future changes on the implementation classes .
 
-     // (5) Another advantage of static factories is that the class of the returned object need not exist when the class
-     // containing the method is written.
+    // (5) Another advantage of static factories is that the class of the returned object need not exist when the class
+    // containing the method is written.
 
-     // (6) The main limitation of providing only static factory methods is that classes without public or protected
-     // constructors cannot be subclassed.
+    // (6) The main limitation of providing only static factory methods is that classes without public or protected
+    // constructors cannot be subclassed.
 
-     // (7) Also, static factory methods are hard for programmers to find.
-     // This problem can be reduced by using common naming conventions. Some examples:
-     // from(), of(), valueOf(), instance() or getInstance(), create() or newInstance(), get"Type"(), new"Type"(), "type"()
+    // (7) Also, static factory methods are hard for programmers to find.
+    // This problem can be reduced by using common naming conventions. Some examples:
+    // from(), of(), valueOf(), instance() or getInstance(), create() or newInstance(), get"Type"(), new"Type"(), "type"()
 
-     // Static factories and public constructors both have their uses. Consider static factories instead of public constructors.
+    // Static factories and public constructors both have their uses. Consider static factories instead of public constructors.
   }
 
-  enum Color {
-    RED, YELLOW, GREEN, BLUE, BLACK, WHITE
+  void item2() { // Consider a builder when faced with many constructor parameters
+
+    // Static factories and constructors share a limitation: they don't scale well to large numbers of optional parameters.
+
+    // Programmers have usually used the "telescoping constructor" pattern, which involves many constructors (See NutritionFactsTelescoping class).
+
+    // When you want to create an instance of NutritionFactsTelescoping, you use the constructor with the shortest parameter list
+    // containing all the parameters you want to set (Have to pass value 0 for unwanted values)
+
+    NutritionFactsTelescoping cocaCola = new NutritionFactsTelescoping(240, 8, 100, 0, 35, 27);
+
+    // A second alternative when facing many optional parameters is the JavaBeans pattern, in which you call a parameterless
+    // constructor to create the object and then call setter methods to set each required parameter and each optional parameter:
+
+    NutritionFactsJavaBeans pepsi = new NutritionFactsJavaBeans();
+    pepsi.setServingSize(240);
+    pepsi.setServings(8);
+    pepsi.setCalories(100);
+    pepsi.setSodium(35);
+    pepsi.setCarbohydrate(27);
+
+    // Because construction is split across multiple calls, a JavaBean may be in an inconsistent state partway through its construction.
+    // Also, the use of JavaBeans requires making the class mutable.
+
+    // There is a third alternative that combines the safety of the telescoping constructor pattern with the readability
+    // of the JavaBeans pattern: The Builder Pattern
+
+    NutritionFacts inkaCola = new NutritionFacts.Builder(240, 8)
+        .calories(100)
+        .sodium(35)
+        .carbohydrate(27)
+        .build();
+
+    // The NutritionFacts class in inmutable, and all parameter default values are in one place
+    // The Builder pattern simulates named optional parameters (Like in Java or Kotlin)
+
+    // The Builder pattern is well suited to class hierarchies. For example, consider an abstract class at the root
+    // of a hierarchy representing various kinds of pizza:
+
+    Pizza pizza;
+
+    // NyPizza and Calzone are both subclasses of Pizza
+    // The result for these "hierarchical builders" is a client code identical to the code for the simple
+    // NutritionFacts builder. (importing enum constant statically in this example for brevity):
+
+    NyPizza nyPizza = new NyPizza.Builder(SMALL)
+        .addTopping(SAUSAGE)
+        .addTopping(ONION)
+        .build();
+
+    Calzone calzone = new Calzone.Builder()
+        .addTopping(HAM)
+        .sauceInside()
+        .build();
+
+    // In summary, the builder pattern is a good choice when designing classes whose constructors or static factories
+    // would have more than a handful of parameters
   }
 }
 
