@@ -25,7 +25,7 @@ public class Chapter2 {
     Boolean anotherBoolean = Boolean.valueOf(false); // Boolean.valueOf() Never creates an object
 
     // (3) Static factory methods can return an object of any subtype of their return type.
-    // (See java.util.Collections) (noninstsantiable companion classes were useful prior to Java 8)
+    // (See java.util.Collections) (non-instantiable companion classes were useful prior to Java 8)
 
     // (4) Static factories return class (subtypes) can vary from call to call depending on the input parameters.
     EnumSet<Color> enumSet = EnumSet.allOf(Color.class); // May return RegularEnumSet or JumboEnumSet.
@@ -77,8 +77,8 @@ public class Chapter2 {
         .carbohydrate(27)
         .build();
 
-    // The NutritionFacts class in inmutable, and all parameter default values are in one place
-    // The Builder pattern simulates named optional parameters (Like in Java or Kotlin)
+    // The NutritionFacts class is immutable, and all parameter default values are in one place
+    // The Builder pattern simulates named optional parameters (Like in C# or Kotlin)
 
     // The Builder pattern is well suited to class hierarchies. For example, consider an abstract class at the root
     // of a hierarchy representing various kinds of pizza:
