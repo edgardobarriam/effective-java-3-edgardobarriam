@@ -131,5 +131,10 @@ public class Chapter2 {
     // approach if your singleton must extend a superclass other than Enum (though you can declare an enum to implement
     // interfaces.
   }
+
+  void item4() { // Enforce noninstantiability with a private constructor.
+    UtilityClass.doSomething();
+    // Because the explicit constructor is private, it is inaccessible outside the class.
+  }
 }
 
