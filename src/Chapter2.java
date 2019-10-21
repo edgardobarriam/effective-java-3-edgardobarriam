@@ -87,7 +87,7 @@ public class Chapter2 {
 
     // NyPizza and Calzone are both subclasses of Pizza
     // The result for these "hierarchical builders" is a client code identical to the code for the simple
-    // NutritionFacts builder. (importing enum constant statically in this example for brevity):
+    // NutritionFacts builder. (importing enum constants statically in this example for brevity):
 
     NyPizza nyPizza = new NyPizza.Builder(SMALL)
         .addTopping(SAUSAGE)
@@ -101,6 +101,35 @@ public class Chapter2 {
 
     // In summary, the builder pattern is a good choice when designing classes whose constructors or static factories
     // would have more than a handful of parameters
+  }
+
+  void item3() { // Enforce the singleton property with a private constructor or an enum type
+
+    // A singleton is simply a class that is instantiated exactly once.
+    // Making a class a singleton can make it difficult to test its clients because it's impossible to substitute
+    // a mock implementation for a singleton unless it implements an interface that serves as its type.
+
+    // There are two common ways to implement singletons, both keep the constructor private and export a
+    // public static member to access the instance:
+
+    // 1. Public member as final field
+    Elvis1.INSTANCE.leaveTheBuilding();
+
+    // 2. Public member as static factory method
+    Elvis2.getInstance().leaveTheBuilding();
+
+    // To make any of these two approaches Serializable, it's not sufficient merely to add "implements Serializable"
+    // to its declaration.
+    // To mantain the singleton guarantee, declare all instance fields transient and provide a readResolve method.
+    // Otherwise, each time a serialized instance is deserialized, a new instance will be created. To prevent this from
+    // happening, add the readResolve method to the Elvis2 class.
+
+    // A third way to implement a singleton is to declare a single-element enum:
+    Elvis3.INSTANCE.leaveTheBuilding();
+    // This approach provides Serialization for free, and provides a guarantee against multiple instantiation.
+    // May feel a bit unnatural, but this is often the best way to implement a singleton. Note that you can't use this
+    // approach if your singleton must extend a superclass other than Enum (though you can declare an enum to implement
+    // interfaces.
   }
 }
 
