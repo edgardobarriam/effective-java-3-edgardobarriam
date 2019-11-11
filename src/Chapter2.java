@@ -10,7 +10,6 @@ import static content.Pizza.Topping.*;
 public class Chapter2 {
 
   void item1() { // Consider static factory methods instead of constructors
-
     // A class can provide a public static factory method. An example from Boolean:
     Boolean myBoolean = Boolean.valueOf(true);
 
@@ -45,7 +44,6 @@ public class Chapter2 {
   }
 
   void item2() { // Consider a builder when faced with many constructor parameters
-
     // Static factories and constructors share a limitation: they don't scale well to large numbers of optional parameters.
 
     // Programmers have usually used the "telescoping constructor" pattern, which involves many constructors (See NutritionFactsTelescoping class).
@@ -104,7 +102,6 @@ public class Chapter2 {
   }
 
   void item3() { // Enforce the singleton property with a private constructor or an enum type
-
     // A singleton is simply a class that is instantiated exactly once.
     // Making a class a singleton can make it difficult to test its clients because it's impossible to substitute
     // a mock implementation for a singleton unless it implements an interface that serves as its type.
@@ -136,5 +133,31 @@ public class Chapter2 {
     UtilityClass.doSomething();
     // Because the explicit constructor is private, it is inaccessible outside the class.
   }
-}
 
+  void item5() { // Prefer dependency injection to hardwiring resources
+    // Many classes depend on one or more resources. For example, a spell checker depends on a dictionary. Usually such
+    // classes are implemented as static utility classes:
+    SpellCheckerStatic.isValid("Pepsi");
+
+    // Similarly, it's not uncommon to see them implemented as singletons:
+    SpellCheckerSingleton.INSTANCE.suggestions("Bepsi");
+
+    // Neither of these approaches is satisfactory, because they assume there is only one dictionary worth using.
+    // There may by many different dictionaries, it may be even desirable to use a special dictionary for testing.
+    // Static utility classes and singletons are inappropriate for classes whose behavior is parametrized by an
+    // underlying resource.
+
+    // What is required is the ability to support multiple instances of the class, each of which uses the resource
+    // desired by the client.
+
+    // A simple pattern that satisfies this requirement is to pass the resource into the constructor when creating
+    // a new instance. This is one form of dependency injection:
+    new SpellCheckerInjection(new Lexicon()).isValid("isded");
+
+    // In summary, don't use a singleton or static utility class to implement a class that depends on one or more
+    // underlying resources whose behavior affects that of the class, and do not have the class create these resources
+    // directly. Instead, pass the resources, or factories to create them, into the constructor (or static factory or
+    // builder. This practice, known as dependency injection, will greatly enhance the flexibility, reusability and
+    // testability of a class.
+  }
+}
