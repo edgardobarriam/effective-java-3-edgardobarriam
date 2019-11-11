@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.List;
 
 public class SpellCheckerSingleton {
-    private final Lexicon dictionary = new Lexicon();
+    private final Lexicon dictionary = new Lexicon("English");
 
     private SpellCheckerSingleton() {} // Noninstantiable
     public static SpellCheckerSingleton INSTANCE = new SpellCheckerSingleton();

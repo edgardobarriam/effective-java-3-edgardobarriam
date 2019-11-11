@@ -5,7 +5,7 @@ import java.util.List;
 
 // Inappropriate use of static utility - inflexible and untestable!
 public class SpellCheckerStatic {
-    private static final Lexicon dictionary = new Lexicon();
+    private static final Lexicon dictionary = new Lexicon("English");
 
     private SpellCheckerStatic() {} // Noninstantiable
 

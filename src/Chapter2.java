@@ -152,7 +152,7 @@ public class Chapter2 {
 
     // A simple pattern that satisfies this requirement is to pass the resource into the constructor when creating
     // a new instance. This is one form of dependency injection:
-    new SpellCheckerInjection(new Lexicon()).isValid("isded");
+    new SpellCheckerInjection(new Lexicon("AnyLanguage")).isValid("isded");
 
     // In summary, don't use a singleton or static utility class to implement a class that depends on one or more
     // underlying resources whose behavior affects that of the class, and do not have the class create these resources
