@@ -160,4 +160,68 @@ public class Chapter2 {
     // builder. This practice, known as dependency injection, will greatly enhance the flexibility, reusability and
     // testability of a class.
   }
+
+  void item6() { // Avoid creating unnecessary objects
+    // It is often appropriate to use a single object instead of creating a new functionally equivalent object each
+    // time it is needed. An object can always be reused if it is immutable.
+
+    // As an extreme example of what not to do, consider this statement:
+    String s = new String("bikini"); // DON'T DO THIS
+
+    // The statement creates a new String each time it is executed, and none of those object creations is necessary.
+    // The argument to the String constructor is itself a String instance. The improved version is:
+    String str = "bikini";
+
+    // This version uses a single String instance, rather than creating a new one each time it is executed. Also, it is
+    // guaranteed that the object will be reused by any other code running in the same virtual machine that happens to
+    // contain the same string literal.
+
+    // You can often avoid creating unnecessary objects by using static factory methods in preference to constructors on
+    // immutable classes that provide both. For example, the static factory method Boolean.valueOf(String) is preferable
+    // to the constructor Boolean(String). The constructor must create a new object each time it's called, while the
+    // factory method is never required to do so and won't in practice. In addition to reusing immutable objects you can
+    // also reuse mutable objects if you know they won't be modified.
+
+    // If you are going to need an "expensive object" repeatedly, it may be advisable to cache it for reuse. Suppose
+    // you want to write a method to determine whether a string is a Roman numeral. The easiest way to do so using
+    // regular expressions is:
+
+    RomanNumerals.isRomanNumeral("XIV");
+
+    // The problem with this implementation is that it relies on the String.matches method. While String.matches is the
+    // easiest way to check if a string matches a regular expression, it's not suitable for repeated use in performance-
+    // critical situations. It internally creates a Pattern instance for the regex and uses it only once, after which
+    // it becomes eligible for garbage collection. Creating a Pattern instance is expensive because it requires
+    // compiling the regex into a finite state machine.
+
+    // To improve performance, compile the regex into a Pattern instance (which is immutable) as part of class
+    // initialization, cache it, and reuse the same instance for every invocation of the method:
+
+    RomanNumeralsImproved.isRomanNumeral("XVI");
+
+    // The improved version provides significant performance gains if invoked frequently (Approximately 6.5 times
+    // faster).
+
+    // Another way to create unnecessary objects is autoboxing, which allows the programmer to mix primitive and boxed
+    // primitive types, boxing and unboxing automatically as needed.
+    // Autoboxing blurs but does not erase the distinction between primitive and boxed primitive types. Consider:
+
+    // Hideously slow! Can you spot the object creation?
+    Long sum = 0L;
+    for (long i = 0; i <= Integer.MAX_VALUE; i++) {
+      sum += i;
+    }
+
+    // The variable sum is declared as a Long instead of a long, which means that the programs constructs about 2^31
+    // unnecessary Long instances. Changing the declaration of sum from Long to long reduced the runtime from 6.3s to
+    // 0.59s. The lesson is clear: prefer primitives to boxed primitives, and watch out for unintentional autoboxing.
+
+    // You should not conclude that object creation is expensive and should be avoided. On the contrary, the creation
+    // and reclamation of small objects whose constructors do little explicit work is cheap, especially on modern JVM
+    // implementations. Creating additional objects to enhance readability or simplicity of a program is generally a
+    // good thing.
+
+    // Conversely, avoiding object creation by maintaining your own object pool is a bad idea unless the objects in the
+    // pool are extremely heavyweight. An example of an object that justifies and object pool is a database connection.
+  }
 }
