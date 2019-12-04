@@ -13,7 +13,8 @@ public class Chapter2 {
     // A class can provide a public static factory method. An example from Boolean:
     Boolean myBoolean = Boolean.valueOf(true);
 
-    // (1) One advantage of static factory methods is that they have names, hence they are often more readable than constructors.
+    // (1) One advantage of static factory methods is that they have names, hence they are often more readable than
+    // constructors.
     BigInteger bigInteger = new BigInteger(1, 1, new Random());
     bigInteger = BigInteger.probablePrime(1, new Random()); // This is easier to read.
 
@@ -28,7 +29,8 @@ public class Chapter2 {
 
     // (4) Static factories return class (subtypes) can vary from call to call depending on the input parameters.
     EnumSet<Color> enumSet = EnumSet.allOf(Color.class); // May return RegularEnumSet or JumboEnumSet.
-    // Also hides implementation classes from clients, which can be helpful if there are any future changes on the implementation classes .
+    // Also hides implementation classes from clients, which can be helpful if there are any future changes on the
+    // implementation classes .
 
     // (5) Another advantage of static factories is that the class of the returned object need not exist when the class
     // containing the method is written.
@@ -38,23 +40,35 @@ public class Chapter2 {
 
     // (7) Also, static factory methods are hard for programmers to find.
     // This problem can be reduced by using common naming conventions. Some examples:
-    // from(), of(), valueOf(), instance() or getInstance(), create() or newInstance(), get"Type"(), new"Type"(), "type"()
+    // from(), of(), valueOf(), instance() or getInstance(), create() or newInstance(),
+    // get"Type"(), new"Type"(), "type"()
 
-    // Static factories and public constructors both have their uses. Consider static factories instead of public constructors.
+    // Static factories and public constructors both have their uses. Consider static factories instead of
+    // public constructors.
   }
 
   void item2() { // Consider a builder when faced with many constructor parameters
-    // Static factories and constructors share a limitation: they don't scale well to large numbers of optional parameters.
+    // Static factories and constructors share a limitation: they don't scale well to large numbers of optional
+    // parameters.
 
-    // Programmers have usually used the "telescoping constructor" pattern, which involves many constructors (See NutritionFactsTelescoping class).
+    // Programmers have usually used the "telescoping constructor" pattern, which involves many constructors
+    // (See NutritionFactsTelescoping class).
 
-    // When you want to create an instance of NutritionFactsTelescoping, you use the constructor with the shortest parameter list
+    // When you want to create an instance of NutritionFactsTelescoping, you use the constructor with the shortest
+    // parameter list
     // containing all the parameters you want to set (Have to pass value 0 for unwanted values)
 
-    NutritionFactsTelescoping cocaCola = new NutritionFactsTelescoping(240, 8, 100, 0, 35, 27);
+    NutritionFactsTelescoping cocaCola = new NutritionFactsTelescoping(
+        240,
+        8,
+        100,
+        0,
+        35,
+        27);
 
-    // A second alternative when facing many optional parameters is the JavaBeans pattern, in which you call a parameterless
-    // constructor to create the object and then call setter methods to set each required parameter and each optional parameter:
+    // A second alternative when facing many optional parameters is the JavaBeans pattern, in which you call a
+    // parameterless constructor to create the object and then call setter methods to set each required parameter and
+    // each optional parameter:
 
     NutritionFactsJavaBeans pepsi = new NutritionFactsJavaBeans();
     pepsi.setServingSize(240);
@@ -63,8 +77,8 @@ public class Chapter2 {
     pepsi.setSodium(35);
     pepsi.setCarbohydrate(27);
 
-    // Because construction is split across multiple calls, a JavaBean may be in an inconsistent state partway through its construction.
-    // Also, the use of JavaBeans requires making the class mutable.
+    // Because construction is split across multiple calls, a JavaBean may be in an inconsistent state partway through
+    // its construction. Also, the use of JavaBeans requires making the class mutable.
 
     // There is a third alternative that combines the safety of the telescoping constructor pattern with the readability
     // of the JavaBeans pattern: The Builder Pattern
@@ -117,7 +131,7 @@ public class Chapter2 {
 
     // To make any of these two approaches Serializable, it's not sufficient merely to add "implements Serializable"
     // to its declaration.
-    // To mantain the singleton guarantee, declare all instance fields transient and provide a readResolve method.
+    // To maintain the singleton guarantee, declare all instance fields transient and provide a readResolve method.
     // Otherwise, each time a serialized instance is deserialized, a new instance will be created. To prevent this from
     // happening, add the readResolve method to the Elvis2 class.
 
@@ -157,7 +171,7 @@ public class Chapter2 {
     // In summary, don't use a singleton or static utility class to implement a class that depends on one or more
     // underlying resources whose behavior affects that of the class, and do not have the class create these resources
     // directly. Instead, pass the resources, or factories to create them, into the constructor (or static factory or
-    // builder. This practice, known as dependency injection, will greatly enhance the flexibility, reusability and
+    // builder). This practice, known as dependency injection, will greatly enhance the flexibility, reusability and
     // testability of a class.
   }
 
@@ -167,9 +181,10 @@ public class Chapter2 {
 
     // As an extreme example of what not to do, consider this statement:
     String s = new String("bikini"); // DON'T DO THIS
-
     // The statement creates a new String each time it is executed, and none of those object creations is necessary.
-    // The argument to the String constructor is itself a String instance. The improved version is:
+    // The argument to the String constructor is itself a String instance.
+
+    // The improved version is:
     String str = "bikini";
 
     // This version uses a single String instance, rather than creating a new one each time it is executed. Also, it is
@@ -223,5 +238,48 @@ public class Chapter2 {
 
     // Conversely, avoiding object creation by maintaining your own object pool is a bad idea unless the objects in the
     // pool are extremely heavyweight. An example of an object that justifies and object pool is a database connection.
+  }
+
+  void item7() { // Eliminate obsolete object references
+    // Consider the following simple stack implementation:
+    Stack stack;
+
+    // There is nothing obviously wrong with this program, but it has a "memory leak" which can silently manifest itself
+    // as reduced performance due to increased garbage collector activity or increased memory footprint.
+    // In extreme cases, such memory leaks can cause disk paging and even program failure with an OutOfMemoryError, but
+    // such failures are relatively rare.
+
+    // Problem is, the objects that were popped off the stack won't be garbage collected, even if the program using the
+    // stack has no more references to them. This happens because the stack maintains obsolete references to these
+    // objects. In this case, any references outside of the "active portion" of the element array are obsolete. The
+    // active portion consists of the elements whose index is less than size.
+    // If and object reference is unintentionally retained, not only is that object excluded from garbage collection,
+    // but so too are any objects referenced by that object, and so on.
+
+    // The fix for this problem is simple: null out the references once they become obsolete. (See improvement)
+
+    // Nulling out object references should be the exception rather than the norm. The best way to eliminate an obsolete
+    // reference is to let the variable that contained the reference fall out of scope. This occurs naturally, if you
+    // define each variable in the narrowest possible scope.
+
+    // What aspect of the Stack class makes it susceptible to memory leaks? Simply put, it manages its own memory.
+    // Generally speaking, whenever a class manages its own memory, the programmer should be alert for memory leaks.
+    // Whenever an element is freed, any object references contained in the element should be nulled out.
+
+    // Another common source of memory leaks is caches. There are several solutions in this case:
+
+    // If the cache entries are relevant exactly as long as there are references to its key outside of the cache,
+    // represent the cache as a WeakHashMap; entries will be removed automatically after they become obsolete.
+    // Remember that WeakHashMap is useful only if the desired lifetime if cache entries is determined by external
+    // references to the key, not the value.
+
+    // More commonly, the useful lifetime of a cache entry is less well defined, with entries becoming less valuable
+    // over time. In this case, the cache should be occasionally cleansed of entries that have fallen into disuse,
+    // maybe by using a background thread or as a side effect of adding new entries to the cache.
+
+    // A third common source of memory leaks is listeners and other callbacks.
+    // If you implement an API where clients register callbacks but don't deregister then explicitly, they will
+    // accumulate unless you take some action. One way to ensure that callbacks are garbage collected is to store only
+    // weak references to then, for instance, by storing them only as keys in a WeakHashMap.
   }
 }
