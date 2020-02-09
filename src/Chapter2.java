@@ -1,9 +1,6 @@
 import content.*;
 
-import java.io.BufferedReader;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.math.BigInteger;
 import java.util.EnumSet;
 import java.util.Random;
@@ -316,4 +313,44 @@ public class Chapter2 {
     // noncritical native resources. Even then, beware the indeterminacy and performance consequences.
   }
 
+  void item9() throws IOException { // Prefer try-with-resources to try-finally
+    // The Java libraries include many resources that must be closed manually by invoking a close method. Examples
+    // include InputStream, OutputStream and java.sql.Connection. Closing resources is often overlooked by clients,
+    // with predictably dire performance consequences. While many of these resources use finalizers as a safety net,
+    // we know finalizers don't work very well.
+
+    // Originally, a try-finally statement was the best way to guarantee that a resource would be closed properly,
+    // even in the face of an exception or return:
+
+    String fakePath = "/tmp/file.txt";
+    BufferedReader br = new BufferedReader(new FileReader(fakePath));
+    // try-finally is no longer the best way to close resources
+    try {
+      br.readLine();
+    } finally {
+      br.close();
+    }
+
+    // Java 7 introduced the try-with-resources statement. To be usable with this construct, a resource must implement
+    // the AutoCloseable interface, which consists og a single void-returning close method. Many classes and interfaces
+    // in the Java libraries and in third-party libraries now implement or extend AutoCloseable.
+    // An example:
+
+    // try-with-resources - the best way to close resources!
+    try (BufferedReader bufferedReader = new BufferedReader(new FileReader(fakePath))) {
+      br.readLine();
+    }
+
+    // It can handle multiple resources:
+    try (InputStream in = new FileInputStream(fakePath); OutputStream out = new FileOutputStream(fakePath)) {
+      byte[] buffer = new byte[128];
+      int n;
+      while ((n = in.read(buffer)) >= 0) {
+        out.write(buffer, 0 , n);
+      }
+    }
+
+    // The lesson is clear: Always use try-with-resources in preference to try-finally when working with resources that
+    // must be closed. The resulting code is shorter and clearer, and the exception that it generates are more useful.
+  }
 }
