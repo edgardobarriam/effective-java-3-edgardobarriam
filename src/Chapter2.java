@@ -1,5 +1,9 @@
 import content.*;
 
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.util.EnumSet;
 import java.util.Random;
@@ -282,4 +286,34 @@ public class Chapter2 {
     // accumulate unless you take some action. One way to ensure that callbacks are garbage collected is to store only
     // weak references to then, for instance, by storing them only as keys in a WeakHashMap.
   }
+
+  void item8() { // Avoid finalizers and cleaners
+    // Finalizers are unpredictable, often dangerous and generally unnecessary.
+    // Their use can cause erratic behavior, poor performance and portability problems. The Java 9 replacement for
+    // finalizers is cleaners. Cleaners are less dangerous than finalizers but still unpredictable, slow, and generally
+    // unnecessary.
+
+    // One shortcoming of finalizers and cleaners is that there is no guarantee they'll be executed promptly. This means
+    // that you should never do anything time-critical in a finalizer or cleaner.
+    // For example, it's a grave error to depend on a finalizer or cleaner to close files because open file descriptors
+    // are a limited resource. If many files are left open as a result of the system's tardiness in running finalizers
+    // or cleaners, a program may fail because it can no longer open files.
+
+    // Not only does the specification provide no guarantee that finalizers or cleaners will run promptly; it provides
+    // no guarantee that they will run at all. As a consequence, you should never depend on a finalizer or cleaner to
+    // update persistent state. For example, depending on a finalizer or cleaner to release a persistent lock on a
+    // shared resource such as a database is a terrible idea.
+
+    // So what should you do instead of writing a finalizer or cleaner for a class whose objects encapsulate resources
+    // that require termination, such as files or threads? Just have your class implement AutoCloseable, and require its
+    // clients to invoke the close method on each instance when it is no longer needed, typically using
+    // try-with-resources to ensure termination even in the face of exceptions. It is worth mentioning that the instance
+    // must keep tracks of whether it has been closed: the close() method must record in a field that the object is no
+    // longer valid, and other methods must check this field and throw an IllegalStateException if they are called after
+    // the object has been closed.
+
+    // In summary, don't use cleaners, or in release prior to Java 9, finalizers, except as a safety net or to terminate
+    // noncritical native resources. Even then, beware the indeterminacy and performance consequences.
+  }
+
 }
