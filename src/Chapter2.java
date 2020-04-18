@@ -8,6 +8,10 @@ import java.util.Random;
 import static content.NyPizza.Size.SMALL;
 import static content.Pizza.Topping.*;
 
+/**
+ * This Chapter concerns creating and destroying objects: when and how to create them, how to ensure they are destroyed
+ * in a timely manner, and how to manage any cleanup actions that must precede their destruction.
+ */
 public class Chapter2 { // Creating and Destroying Objects
 
   void item1() { // Consider static factory methods instead of constructors
