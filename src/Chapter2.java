@@ -8,7 +8,7 @@ import java.util.Random;
 import static content.NyPizza.Size.SMALL;
 import static content.Pizza.Topping.*;
 
-public class Chapter2 {
+public class Chapter2 { // Creating and Destroying Objects
 
   void item1() { // Consider static factory methods instead of constructors
     // A class can provide a public static factory method. An example from Boolean:
